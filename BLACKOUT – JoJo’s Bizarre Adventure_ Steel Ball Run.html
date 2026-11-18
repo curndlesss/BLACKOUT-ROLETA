@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BLACKOUT – JoJo’s Bizarre Adventure: Steel Ball Run</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{--bg:#05110d;--panel:#0a1f18;--panel2:#0d2a20;--em:#10b981;--gold:#fde047;--gold2:#eab308;--sky:#7dd3fc;--txt:#e7f5ee;--mut:#8fb5a5;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{background:var(--bg);color:var(--txt);margin:0;min-height:100%}
+body{font-family:'Cinzel',serif;overflow-x:hidden}
+.bangers{font-family:'Bangers','Impact',sans-serif}
+.title{font-family:'Bangers','Impact',sans-serif;letter-spacing:.08em;background:linear-gradient(180deg,#fff7b0,#fde047 45%,#b45309);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(3px 3px 0 #064e3b)}
+.panel{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid rgba(16,185,129,.35);border-radius:14px}
+.btn{font-family:'Bangers',sans-serif;letter-spacing:.06em;border-radius:10px;padding:.55rem 1.1rem;transition:transform .12s,filter .12s}
+.btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.12)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-gold{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#1a1200}
+.btn-em{background:#065f46;color:var(--txt);border:1px solid var(--em)}
+.btn-ghost{background:transparent;border:1px solid rgba(125,211,252,.5);color:var(--sky)}
+.tab{font-family:'Bangers',sans-serif;letter-spacing:.07em;font-size:1.25rem;padding:.45rem 1.2rem;border-radius:10px 10px 0 0;border:1px solid rgba(16,185,129,.35);border-bottom:0;color:var(--mut);background:#08170f}
+.tab.on{background:var(--em);color:#04150f}
+input[type=text]{background:#04100b;border:1px solid rgba(16,185,129,.5);border-radius:9px;color:var(--txt);padding:.5rem .8rem;width:100%;font-family:inherit}
+input[type=text]:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bg-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.menace{position:absolute;bottom:-12vh;font-family:'Bangers',sans-serif;color:rgba(16,185,129,.16);animation:floatUp linear infinite}
+@keyframes floatUp{to{transform:translateY(-125vh) rotate(18deg)}}
+.ball{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 28%,#e8fff5,#7aa596 35%,#1f3b31 75%);opacity:.22;animation:spin 14s linear infinite}
+.ball::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(253,224,71,.5) 0 4deg,transparent 4deg 30deg);mix-blend-mode:overlay}
+@keyframes spin{to{transform:rotate(360deg)}}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.modal-bg{position:fixed;inset:0;background:rgba(2,8,5,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{max-width:30rem;width:100%;text-align:center;border:2px solid var(--gold);box-shadow:0 0 60px rgba(253,224,71,.3);animation:pop .35s ease-out}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.stat{border:1px solid rgba(16,185,129,.5);border-radius:10px;padding:.5rem .3rem;background:#04100b}
+.row{display:flex;align-items:center;gap:.5rem;padding:.3rem .5rem;border-radius:8px;font-size:.9rem}
+.row:hover{background:rgba(16,185,129,.1)}
+.row.off span{opacity:.4;text-decoration:line-through}
+@media (prefers-reduced-motion:reduce){.menace,.ball{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bg" aria-hidden="true"></div>
+<main class="relative z-10 max-w-6xl mx-auto px-4 py-6">
+  <header class="text-center mb-5">
+    <h1 class="title text-6xl sm:text-8xl leading-none">BLACKOUT</h1>
+    <p class="text-sm sm:text-base tracking-widest mt-2" style="color:var(--sky)">JOJO’S BIZARRE ADVENTURE: STEEL BALL RUN</p>
+    <button id="muteBtn" class="btn btn-ghost mt-3 text-sm" aria-pressed="false">Som: desligado</button>
+  </header>
+
+  <nav class="flex gap-1 flex-wrap" role="tablist">
+    <button class="tab on" data-tab="fam" role="tab">Famílias</button>
+    <button class="tab" data-tab="stand" role="tab">Stands</button>
+    <button class="tab" data-tab="hist" role="tab">Corrida</button>
+    <button class="tab" data-tab="ficha" role="tab">Ficha</button>
+  </nav>
+
+  <section id="gameView" class="grid lg:grid-cols-[1fr_22rem] gap-4 panel p-4 rounded-tl-none">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-full max-w-md">
+        <label for="player" class="block text-sm mb-1" style="color:var(--gold)">Nome do corredor</label>
+        <input id="player" type="text" maxlength="24" placeholder="Digite seu nome para girar" autocomplete="off">
+        <p id="info" class="text-sm mt-1" style="color:var(--mut)"></p>
+      </div>
+      <div class="relative w-full max-w-[460px]">
+        <canvas id="wheel" width="460" height="460" class="w-full h-auto" aria-label="Roleta"></canvas>
+      </div>
+      <button id="spinBtn" class="btn btn-gold text-2xl px-10">GIRAR</button>
+      <label class="text-sm flex gap-2 items-center"><input type="checkbox" id="rmDrawn" class="accent-emerald-500"> Remover item sorteado após o giro</label>
+    </div>
+
+    <aside class="flex flex-col gap-2 min-h-0">
+      <h2 id="listTitle" class="bangers text-2xl" style="color:var(--gold)"></h2>
+      <input id="filter" type="text" placeholder="Filtrar itens">
+      <div class="flex gap-2"><input id="addInp" type="text" placeholder="Novo nome"><button id="addBtn" class="btn btn-em">Adicionar</button></div>
+      <div class="flex gap-2 flex-wrap">
+        <button id="shuf" class="btn btn-ghost text-sm">Embaralhar</button>
+        <button id="rest" class="btn btn-ghost text-sm">Restaurar lista</button>
+      </div>
+      <div id="list" class="overflow-y-auto max-h-[22rem] pr-1"></div>
+    </aside>
+  </section>
+
+  <section id="histView" class="panel p-4 rounded-tl-none hidden">
+    <div class="flex flex-wrap gap-2 items-center justify-between mb-3">
+      <h2 class="bangers text-3xl" style="color:var(--gold)">Corrida: histórico</h2>
+      <div class="flex gap-2">
+        <button id="resetSpins" class="btn btn-ghost text-sm">Resetar giros</button>
+        <button id="clearHist" class="btn btn-em text-sm">Limpar histórico</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-left" style="color:var(--sky)"><th class="p-2">Hora</th><th class="p-2">Corredor</th><th class="p-2">Categoria</th><th class="p-2">Resultado</th><th class="p-2">Bônus</th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+    <p id="histEmpty" class="text-center py-8" style="color:var(--mut)">Nenhum sorteio ainda. Gire a roleta para abrir a corrida.</p>
+  </section>
+<section id="fichaView" class="panel p-4 rounded-tl-none hidden">
+    <h2 class="bangers text-3xl mb-3" style="color:var(--gold)">Ficha de competidor</h2>
+    <div class="flex gap-2 flex-wrap max-w-lg"><div class="flex-1 min-w-[12rem]"><input id="fName" type="text" maxlength="24" placeholder="Nome do corredor" autocomplete="off"></div><button id="fGen" class="btn btn-gold">Gerar ficha</button></div>
+    <p id="fMsg" class="text-sm mt-2" style="color:var(--mut)">Digite o nome de quem já girou para montar a ficha.</p>
+    <pre id="fOut" class="mt-3 p-4 rounded-lg overflow-x-auto" style="background:#04100b;border:1px solid var(--gold2);color:var(--txt);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95rem;line-height:1.6;white-space:pre-wrap"></pre>
+    <button id="fCopy" class="btn btn-em mt-3">Copiar ficha</button>
+  </section>
+</main>
+
+<div id="modal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="mItem">
+  <div class="modal panel p-6">
+    <p class="bangers text-2xl" style="color:var(--sky)" id="mName"></p>
+    <p class="text-sm" id="mCat" style="color:var(--mut)"></p>
+    <h3 id="mItem" class="title text-5xl sm:text-6xl my-3 leading-tight"></h3>
+    <div id="mStats" class="my-3 hidden">
+      <p id="subRes" class="bangers text-4xl" style="color:var(--gold)">&nbsp;</p>
+    </div>
+    <p id="mNote" class="text-sm mb-2" style="color:var(--mut)"></p>
+    <p class="bangers text-3xl mt-2" style="color:var(--em)">Sua alma ascendeu!</p>
+    <div class="flex gap-2 justify-center mt-4">
+      <button id="nextBtn" class="btn btn-gold text-xl">Próximo Jogador</button>
+      <button id="fichaBtn" class="btn btn-em">Gerar ficha</button>
+      <button id="closeBtn" class="btn btn-ghost">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STANDS=["Star Platinum","The World","Magicians Red","Silver Chariot","Hierophant Green","The Fool","Cream","Horus","The Sun","Killer Queen","The Hand","Crazy Diamond","Gold Experience","King Crimson","Purple Haze","Metallica","White Album","Whitesnake","D4C","Tusk","Mandom","Catch the Rainbow","Wonder of U","Soft and Wet","November Rain"];
+const FAMS=["Joestar","Zeppeli","Brando","Higashikata","Kujo","Polnareff","Kakyoin","Speedwagon","Nijimura","Kira","Avdol"];
+// Sub-roleta só para os clãs Joestar, Brando e Zeppeli
+const CHANCE=0.10;
+const SUB={Joestar:["Stand"],Brando:["Stand"],Zeppeli:["Spin","Hamon"]};
+const CATS={stand:{name:"Stands",limit:1,orig:STANDS},fam:{name:"Famílias",limit:2,orig:FAMS}};
+const COLORS=["#065f46","#0b3d2e","#854d0e","#0c4a6e","#047857","#713f12"];
+const state={tab:"fam",lists:{},spins:{stand:{},fam:{}},hist:[],angle:0,busy:false,muted:true,current:null};
+for(const k in CATS)state.lists[k]=CATS[k].orig.map(n=>({n,on:true}));
+const $=id=>document.getElementById(id);
+const cv=$("wheel"),ctx=cv.getContext("2d");
+
+// ---------- Áudio ----------
+let AC=null;
+function tone(f,d,type="square",v=.06,when=0){if(state.muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+when;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d)}catch(e){}}
+const tick=()=>tone(900,.04,"square",.04);
+const fanfare=()=>[392,494,587,784].forEach((f,i)=>tone(f,.35,"sawtooth",.07,i*.12));
+const reveal=()=>tone(300+Math.random()*500,.05,"triangle",.05);
+$("muteBtn").onclick=()=>{state.muted=!state.muted;$("muteBtn").textContent=state.muted?"Som: desligado":"Som: ligado";$("muteBtn").setAttribute("aria-pressed",!state.muted);if(!state.muted){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}tone(660,.12,"triangle")}};
+
+// ---------- Fundo ----------
+(function(){const bg=$("bg"),ch=["ゴ","★","ゴ","★"];for(let i=0;i<16;i++){const e=document.createElement("div");e.className="menace";e.textContent=ch[i%4];e.style.left=Math.random()*96+"%";e.style.fontSize=(28+Math.random()*60)+"px";e.style.animationDuration=(16+Math.random()*20)+"s";e.style.animationDelay=(-Math.random()*30)+"s";bg.appendChild(e)}
+[[8,12,90],[78,55,130],[40,80,70],[90,8,60]].forEach(([l,t,s])=>{const b=document.createElement("div");b.className="ball";b.style.cssText=`left:${l}%;top:${t}%;width:${s}px;height:${s}px;animation-duration:${10+s/10}s`;bg.appendChild(b)})})();
+
+// ---------- Roleta ----------
+const active=()=>state.lists[state.tab].filter(i=>i.on);
+function draw(){
+  const items=active(),n=items.length,W=cv.width,c=W/2,r=c-14;
+  ctx.clearRect(0,0,W,W);
+  ctx.save();ctx.translate(c,c);
+  ctx.beginPath();ctx.arc(0,0,r+10,0,7);ctx.fillStyle="#b45309";ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,r+5,0,7);ctx.fillStyle="#fde047";ctx.fill();
+  if(!n){ctx.fillStyle="#05110d";ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();ctx.fillStyle="#8fb5a5";ctx.textAlign="center";ctx.font="18px Cinzel";ctx.fillText("Ative ao menos 2 itens",0,6);ctx.restore();return}
+  const a=2*Math.PI/n;
+  items.forEach((it,i)=>{
+    const s=state.angle+i*a;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,s,s+a);ctx.closePath();
+    ctx.fillStyle=COLORS[i%COLORS.length];ctx.fill();ctx.strokeStyle="rgba(253,224,71,.55)";ctx.lineWidth=1.5;ctx.stroke();
+    ctx.save();ctx.rotate(s+a/2);ctx.textAlign="right";ctx.fillStyle="#f4fff9";
+    const fs=Math.max(9,Math.min(17,Math.floor(r*Math.PI*2/n*.38)));
+    ctx.font=`700 ${fs}px Cinzel`;
+    let t=it.n;if(t.length>18)t=t.slice(0,17)+"…";
+    ctx.fillText(t,r-14,fs/3);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(0,0,34,0,7);ctx.fillStyle="radial-gradient(#fff,#999)";
+  const g=ctx.createRadialGradient(-8,-8,3,0,0,34);g.addColorStop(0,"#e8fff5");g.addColorStop(.6,"#7aa596");g.addColorStop(1,"#1f3b31");ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle="#fde047";ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle="#fde047";ctx.font="26px Bangers";ctx.textAlign="center";ctx.fillText("★",0,9);
+  ctx.restore();
+  // ponteiro
+  ctx.beginPath();ctx.moveTo(c-16,2);ctx.lineTo(c+16,2);ctx.lineTo(c,40);ctx.closePath();ctx.fillStyle="#7dd3fc";ctx.fill();ctx.strokeStyle="#05110d";ctx.lineWidth=3;ctx.stroke();
+}
+
+// ---------- Lista ----------
+function renderList(){
+  const L=state.lists[state.tab],f=$("filter").value.trim().toLowerCase();
+  $("listTitle").textContent=CATS[state.tab].name+" ("+active().length+"/"+L.length+")";
+  const box=$("list");box.innerHTML="";
+  L.forEach((it,i)=>{
+    if(f&&!it.n.toLowerCase().includes(f))return;
+    const d=document.createElement("label");d.className="row"+(it.on?"":" off");
+    d.innerHTML='<input type="checkbox" class="accent-emerald-500"'+(it.on?" checked":"")+'><span class="flex-1"></span><button class="text-xs" style="color:#fca5a5" aria-label="Remover">✕</button>';
+    d.querySelector("span").textContent=it.n;
+    d.querySelector("input").onchange=e=>{if(state.busy)return;it.on=e.target.checked;refresh()};
+    d.querySelector("button").onclick=e=>{e.preventDefault();if(state.busy)return;L.splice(i,1);refresh()};
+    box.appendChild(d);
+  });
+}
+function refresh(){renderList();draw();updateInfo()}
+function updateInfo(){
+  const name=$("player").value.trim(),cat=CATS[state.tab];
+  const used=(state.spins[state.tab][name.toLowerCase()]||0);
+  $("info").textContent=name?(used>=cat.limit?"Sem giros restantes para este corredor em "+cat.name+".":"Giros restantes em "+cat.name+": "+(cat.limit-used)+" de "+cat.limit):"Cada corredor tem "+cat.limit+" giro"+(cat.limit>1?"s":"")+" em "+cat.name+".";
+}
+$("filter").oninput=renderList;
+$("player").oninput=updateInfo;
+$("addBtn").onclick=addItem;
+$("addInp").onkeydown=e=>{if(e.key==="Enter")addItem()};
+function addItem(){const v=$("addInp").value.trim();if(!v)return;const L=state.lists[state.tab];if(L.some(i=>i.n.toLowerCase()===v.toLowerCase())){$("addInp").classList.add("shake");setTimeout(()=>$("addInp").classList.remove("shake"),400);return}L.push({n:v,on:true});$("addInp").value="";refresh()}
+$("shuf").onclick=()=>{if(state.busy)return;const L=state.lists[state.tab];for(let i=L.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[L[i],L[j]]=[L[j],L[i]]}refresh()};
+$("rest").onclick=()=>{if(state.busy)return;state.lists[state.tab]=CATS[state.tab].orig.map(n=>({n,on:true}));refresh()};
+
+// ---------- Abas ----------
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  if(state.busy)return;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t===b));
+  const t=b.dataset.tab,game=t==="stand"||t==="fam";
+  $("gameView").classList.toggle("hidden",!game);$("histView").classList.toggle("hidden",t!=="hist");$("fichaView").classList.toggle("hidden",t!=="ficha");
+  if(t==="hist")renderHist();else if(t==="ficha")initFicha();else{state.tab=t;$("filter").value="";refresh()}
+});
+
+// ---------- Giro ----------
+$("spinBtn").onclick=()=>{
+  if(state.busy)return;
+  const name=$("player").value.trim(),cat=CATS[state.tab],key=name.toLowerCase();
+  const warn=m=>{$("info").textContent=m;$("info").style.color="#fca5a5";$("player").classList.add("shake");setTimeout(()=>{$("player").classList.remove("shake");$("info").style.color=""},1200)};
+  if(!name){warn("Informe o nome do corredor antes de girar.");$("player").focus();return}
+  if((state.spins[state.tab][key]||0)>=cat.limit){warn(name+" já usou "+(cat.limit>1?"os "+cat.limit+" giros":"o giro")+" de "+cat.name+". Use Próximo Jogador.");return}
+  const items=active();
+  if(items.length<2){warn("Ative pelo menos 2 itens na lista.");return}
+  state.busy=true;$("spinBtn").disabled=true;
+  const n=items.length,a=2*Math.PI/n,win=Math.random()*n|0;
+  const target=-Math.PI/2-(win+.5)*a+(Math.random()-.5)*a*.7;
+  const mod=x=>((x%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  const total=mod(target-state.angle)+2*Math.PI*(6+Math.random()*3);
+  const start=state.angle,dur=5600,t0=performance.now();let lastSlice=-1;
+  (function frame(now){
+    const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);
+    state.angle=start+total*e;
+    const sl=Math.floor(mod(-Math.PI/2-state.angle)/a);
+    if(sl!==lastSlice){lastSlice=sl;tick()}
+    draw();
+    if(p<1)requestAnimationFrame(frame);else finish(name,key,items[Math.floor(mod(-Math.PI/2-state.angle)/a)%n]);
+  })(t0);
+};
+
+function finish(name,key,item){
+  const tab=state.tab;
+  state.spins[tab][key]=(state.spins[tab][key]||0)+1;
+  state.busy=false;$("spinBtn").disabled=false;
+  const isFam=tab==="fam",sub=isFam?SUB[item.n]:null;
+  const bonusTxt=isFam?(sub?"Sorteando Stand...":"Sem sub-roleta"):"-";
+  const entry={time:new Date().toLocaleTimeString("pt-BR"),name,cat:CATS[tab].name,res:item.n,bonus:bonusTxt};
+  state.hist.unshift(entry);
+  state.current=item;state.last=name;state.goStand=false;$("nextBtn").textContent="Próximo Jogador";
+  $("mName").textContent=name;
+  $("mCat").textContent=CATS[tab].name+(isFam?" – giro "+state.spins[tab][key]+" de 2":"");
+  $("mItem").textContent=item.n;
+  $("mNote").textContent=isFam&&!sub?"A linhagem "+item.n+" não possui sub-roleta.":"";
+  $("mStats").classList.toggle("hidden",!sub);
+  $("modal").classList.add("open");fanfare();
+  if(sub)rollStand(item.n,sub,entry);
+  state.pending=$("rmDrawn").checked?{tab,item}:null;
+  refresh();
+  $("nextBtn").focus();
+}
+
+// Roleta oculta de atributos
+function rollStand(fam,opts,entry){
+  const got=opts.filter(()=>Math.random()<CHANCE),ok=got.length>0;
+  const res=ok?"Pegou "+got.join(" e "):"Não pegou "+opts.join(" nem ");
+  $("subRes").textContent="Sorteando...";$("subRes").style.color="var(--mut)";
+  $("nextBtn").disabled=true;$("closeBtn").disabled=true;$("fichaBtn").disabled=true;
+  setTimeout(()=>{
+    $("subRes").textContent=res;$("subRes").style.color=ok?"var(--gold)":"#fca5a5";
+    $("mNote").textContent=ok?"A linhagem "+fam+" liberou: "+got.join(" e ")+".":"A linhagem "+fam+" não liberou poder desta vez.";
+    entry.bonus=res;if(got.includes("Stand")){state.goStand=true;$("nextBtn").textContent="Girar Stand"}
+    if(ok)fanfare();else tone(180,.4,"sawtooth",.06);
+    $("nextBtn").disabled=false;$("closeBtn").disabled=false;$("fichaBtn").disabled=false;$("nextBtn").focus();
+  },1000);
+}
+
+// ---------- Modal ----------
+const closeModal=()=>{$("modal").classList.remove("open");const p=state.pending;state.pending=null;if(p){const L=state.lists[p.tab],i=L.indexOf(p.item);if(i>-1)L.splice(i,1);refresh()}if(state.goStand){state.goStand=false;document.querySelector('[data-tab="stand"]').click()}};
+$("closeBtn").onclick=closeModal;
+$("nextBtn").onclick=()=>{const keep=state.goStand;closeModal();if(!keep)$("player").value="";updateInfo();$("player").focus()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+
+// ---------- Histórico ----------
+function renderHist(){
+  const tb=$("histBody");tb.innerHTML="";
+  $("histEmpty").style.display=state.hist.length?"none":"block";
+  state.hist.forEach(h=>{
+    const tr=document.createElement("tr");tr.style.borderTop="1px solid rgba(16,185,129,.2)";
+    [h.time,h.name,h.cat,h.res,h.bonus].forEach((v,i)=>{const td=document.createElement("td");td.className="p-2";td.textContent=v;if(i===3){td.style.color="#fde047";td.style.fontWeight="700"}tr.appendChild(td)});
+    tb.appendChild(tr);
+  });
+}
+$("clearHist").onclick=()=>{state.hist=[];renderHist()};
+$("resetSpins").onclick=()=>{state.spins={stand:{},fam:{}};updateInfo();$("resetSpins").textContent="Giros resetados";setTimeout(()=>$("resetSpins").textContent="Resetar giros",1400)};
+
+// ---------- Ficha de competidor ----------
+const reg={};let regN=0;
+function fichaText(name){
+  const key=name.toLowerCase();
+  if(!reg[key])reg[key]=String(++regN).padStart(3,"0");
+  const mine=state.hist.filter(h=>h.name.toLowerCase()===key).reverse();
+  const fams=mine.filter(h=>h.cat==="Famílias").map(h=>h.res);
+  const st=mine.filter(h=>h.cat==="Stands").map(h=>h.res);
+  const ex=new Set();
+  mine.filter(h=>h.cat==="Famílias"&&h.bonus.startsWith("Pegou")).forEach(h=>h.bonus.replace("Pegou ","").split(" e ").forEach(p=>ex.add(p==="Stand"?"Stand (linhagem)":p)));
+  const estilo=[...st,...ex].join(" + ")||"—";
+  const giros="Stand "+(state.spins.stand[key]||0)+"/1 · Família "+(state.spins.fam[key]||0)+"/2";
+  return [
+"╭━━━━━━━━━━━━━━━ 🏇 ━━━━━━━━━━━━━━━╮",
+"　　　　 STEEL BALL RUN",
+"　　　REGISTRO DE COMPETIDOR",
+"╰━━━━━━━━━━━━━━━ 🏇 ━━━━━━━━━━━━━━━╯",
+"🏇 Nome: "+name,
+"👨‍👩‍👦 Família: "+(fams.join(" / ")||"—"),
+"⚙️ Stand / Estilo: "+estilo,
+"🔄 Giros: "+giros,
+"🏆 Número de Inscrição: "+reg[key],
+"╭━━━━━━━━━━━━━━━━━━━━╮",
+"　　　 STEEL BALL RUN — 1890",
+"╰━━━━━━━━━━━━━━━━━━━━╯"].join("\n");
+}
+function showFicha(){
+  const name=$("fName").value.trim(),key=name.toLowerCase();
+  if(!name){$("fMsg").textContent="Informe o nome do corredor.";return}
+  if(!state.hist.some(h=>h.name.toLowerCase()===key)){$("fOut").textContent="";$("fMsg").textContent=name+" ainda não girou nenhuma roleta.";return}
+  $("fMsg").textContent="Ficha pronta. Use Copiar ficha para colar onde quiser.";
+  $("fOut").textContent=fichaText(name);
+}
+function initFicha(){$("fName").value=state.last||"";$("fOut").textContent="";if($("fName").value)showFicha()}
+$("fGen").onclick=showFicha;
+$("fName").onkeydown=e=>{if(e.key==="Enter")showFicha()};
+$("fCopy").onclick=async()=>{
+  const t=$("fOut").textContent;if(!t)return;
+  try{await navigator.clipboard.writeText(t);$("fCopy").textContent="Copiado"}catch(e){$("fCopy").textContent="Selecione o texto e copie"}
+  setTimeout(()=>$("fCopy").textContent="Copiar ficha",1600);
+};
+$("fichaBtn").onclick=()=>{closeModal();document.querySelector('[data-tab="ficha"]').click()};
+
+refresh();
+</script>
+</body>
+</html>
